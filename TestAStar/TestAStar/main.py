@@ -8,7 +8,8 @@ def main():
 	testAStar.readMap('Map1.txt');
 	gameUI.addModel(testAStar, 'testAStar');
 	gameUI.startUI();
-	print(testAStar.getDataPoints());
+	testAStar.findShortestPath(testAStar.getStartPoint(), testAStar.getEndPoint());
+	#print(testAStar.getDataPoints());
 
 if(__name__ == '__main__'):
 	main();
