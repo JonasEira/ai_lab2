@@ -52,14 +52,18 @@ class TestAStar():
 	def getDataPoints(self):
 		return self.points;
 	
+	def getRoute(self):
+		return self.passedNodes;
+
 	def findNextNode(self, location, passedNodes):
 		# This method will route from location to start and pick the
 		# next node closest to start out of the startlocations neighbours
 		neighBours = self.getNeighbours(passedNodes[len(passedNodes)-1]);
 		minDistance = 10000000.0;
 		for neighBour in neighBours:
-			neighbourDistanceToStart = self.getDistanceBetween(neighBour, self.passedNodes);
-			if(minDistance > neighbourDistanceToStart):
+			neighbourDistanceToStart = self.getStartWeight(neighBour, self.passedNodes);
+			neighBourDistanceToGoal = self.getGoalWeight(neighbour);
+			if(minDistance >= neighbourDistanceToStart):
 				minDistance = neighbourDistanceToStart;
 				minNeighBour = neighBour;
 		return minNeighBour;
@@ -87,13 +91,17 @@ class TestAStar():
 			
 		for n in range(lowN,highN):
 			for k in range(lowK,highK):
-				if( x[n][k] == 1 and (x[n][k] not in self.passedNodes)):
+				newPoint = [loc[0] + n - 1, loc[1] + k - 1];
+				if( x[n][k] == 1 and (newPoint not in self.passedNodes)):
 					print('n=' + str(n) + ' k=' + str(k));
-					neighbours.append([loc[0] + n - 1, loc[1] + k - 1]);
+					neighbours.append(newPoint);
 		return neighbours;
 
-	def getDistanceBetween(self, location, passedNodes):
-		return math.sqrt( (math.fabs(location[0] - self.startPoint[0])**2 + math.fabs(location[1] - self.startPoint[1])**2 )  );
+	def getStartWeight(self, location, passedNodes):
+		return len(passedNodes);
+
+	def getGoalWeight(self, location):
+
 
 	def fullPath(self, passedNodes, currentNode):
 		# This method will return a list of nodes bet
@@ -115,7 +123,7 @@ class TestAStar():
 			currentNode = self.startPoint;
 			testing = 0;
 			self.passedNodes.append(currentNode);
-			while(testing < 10):
+			while(len(self.passedNodes) < totalLength):
 				currentNode = self.findNextNode(self.endPoint, self.passedNodes);
 				self.passedNodes.append(currentNode);
 				if(currentNode == self.endPoint):
@@ -123,5 +131,4 @@ class TestAStar():
 					print('FOUND IT!');
 				else:
 					print('Passing: ' + str(currentNode) + ' started at: ' + str(self.startPoint));
-				testing = testing + 1;
 	## Other help mehods
