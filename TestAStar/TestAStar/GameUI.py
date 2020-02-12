@@ -1,12 +1,14 @@
 import pygame;
 from pygame.math import Vector2 as vector;
-models = {}
+import time;
+
 class GameUI(object):
     def __init__(self):
-        pass;
+        self.models = {}
+        self.pause = False;
 
     def addModel(self, model, name):
-        models[name] = model;
+        self.models[name] = model;
 
     def startUI(self):
         pygame.init()
@@ -18,8 +20,21 @@ class GameUI(object):
                 if event.type == pygame.QUIT:
                     print('Quit command received')
                     running = False;
-            self.drawGameSurface();
-            pygame.display.update();
+                
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        model = self.models['testAStar'];
+                        model.findShortestPath(model.getStartPoint(), model.getEndPoint());
+                    if event.key == pygame.K_SPACE:
+                        self.pause = not self.pause;
+                        model = self.models['testAStar'];
+                        model.setPaused(self.paused);
+                    if event.key == pygame.K_ESCAPE:
+                        model = self.models['testAStar'];
+                        model.setRunning(False);
+                        running = False;
+                time.sleep(0.05);
+            self.update();
 
     def drawLine(self, x1, y1, x2, y2, r, g, b):
         color = pygame.Color(r, g, b);
@@ -32,12 +47,17 @@ class GameUI(object):
         area = pygame.Rect(x, y, w, h);
         pygame.draw.rect(self.screen, color, area, 1);
 
+    def update(self):
+        self.drawGameSurface();
+        self.drawPassedNodes(); #Debug
+        pygame.display.update();
+
     def drawGameSurface(self):
         row = 0;
         column = 0;
         [width, height] = pygame.display.get_surface().get_size()
-        bSize = height / len(models['testAStar'].getDataPoints()[0]);
-        for dataPointRow in models['testAStar'].getDataPoints():
+        bSize = height / len(self.models['testAStar'].getDataPoints()[0]);
+        for dataPointRow in self.models['testAStar'].getDataPoints():
             for dataPoint in dataPointRow:
                 column = column + 1;
                 if(dataPoint == 'X'):
@@ -48,3 +68,13 @@ class GameUI(object):
                     self.drawRect(bSize*column, bSize*row, bSize, bSize, 255, 0, 255);
             column = 0;
             row = row + 1;
+
+    def drawPassedNodes(self):
+        index = 0;
+        [width, height] = pygame.display.get_surface().get_size()
+        bSize = height / len(self.models['testAStar'].getDataPoints()[0]);
+        passedNodes = self.models['testAStar'].getPassedNodes();
+        for dataPoint in passedNodes:
+            self.drawRect(bSize*dataPoint[0][0]+1, bSize*dataPoint[0][1]+1, bSize-1, bSize-1, 255, 255, 255);
+            index = index + 1;
+            
