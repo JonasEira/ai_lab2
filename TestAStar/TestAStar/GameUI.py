@@ -28,7 +28,7 @@ class GameUI(object):
                     if event.key == pygame.K_SPACE:
                         self.pause = not self.pause;
                         model = self.models['testAStar'];
-                        model.setPaused(self.paused);
+                        model.setPaused(self.pause);
                     if event.key == pygame.K_ESCAPE:
                         model = self.models['testAStar'];
                         model.setRunning(False);
@@ -50,7 +50,19 @@ class GameUI(object):
     def update(self):
         self.drawGameSurface();
         self.drawPassedNodes(); #Debug
+        #self.drawNodesToGoal();
         pygame.display.update();
+
+    
+    #def drawNodesToGoal(self):
+    #    index = 0;
+    #    [width, height] = pygame.display.get_surface().get_size()
+    #    bSize = height / len(self.models['testAStar'].getDataPoints()[0]);
+    #    nodesToGoal = self.models['testAStar'].getNodesToGoal();
+    #    for dataPoint in nodesToGoal:
+    #        self.drawRect(bSize*dataPoint[0][0]+1, bSize*dataPoint[0][1]+1, bSize-1, bSize-1, 180, 180, 180);
+    #        index = index + 1;
+            
 
     def drawGameSurface(self):
         row = 0;
@@ -74,7 +86,18 @@ class GameUI(object):
         [width, height] = pygame.display.get_surface().get_size()
         bSize = height / len(self.models['testAStar'].getDataPoints()[0]);
         passedNodes = self.models['testAStar'].getPassedNodes();
+        lastNode = 0;
+        greyColorInt = 128;
+        whiteColorInt = 255;
+        colorInt = whiteColorInt;
         for dataPoint in passedNodes:
-            self.drawRect(bSize*dataPoint[0][0]+1, bSize*dataPoint[0][1]+1, bSize-1, bSize-1, 255, 255, 255);
+            if lastNode != 0: 
+                if(lastNode[0][1] < dataPoint[0][1]):
+                    colorInt = greyColorInt;
+                else:
+                    colorInt = whiteColorInt;
+            self.drawRect(bSize*dataPoint[0][0]+1, bSize*dataPoint[0][1]+1, bSize, bSize, colorInt, colorInt, colorInt);
+                
+            lastNode = dataPoint;
             index = index + 1;
             

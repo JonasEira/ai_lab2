@@ -6,6 +6,7 @@ class TestAStar():
 	def __init__(self, callback):
 		self.points = [[]];
 		self.passedNodes = [];
+		self.nodesToGoal = [];
 		self.callback = callback;
 		self.paused = False;
 		self.running = True;
@@ -64,37 +65,44 @@ class TestAStar():
 	def getPassedNodes(self):
 		return self.passedNodes;
 
+	def getNodesToGoal(self):
+		return self.nodesToGoal;
+
 	def findNextNode(self, location, passedNodes):
 		# This method will route from location to start and pick the
 		# next node closest to start out of the startlocations neighbours
-		neighBours = self.getNeighbours(passedNodes[len(passedNodes)-1]);
+		neighBours = self.getNeighbours(passedNodes[len(passedNodes)-1], self.passedNodes);
 		minStartDistance = 10000000.0;
 		minGoalDistance = 10000000.0;
 		minTotalDistance = 10000000.0;
 		minTotalOfAll = 10000000.0;
-		minNeighBour = None;
+		minNeighBour = 0;
+		distances = [];
+
 		for neighBour in neighBours:
 			
 			neighbourDistanceToStart = self.getStartWeight(neighBour);
 			# Checks if this is the node closest to start
-			if(neighbourDistanceToStart < minStartDistance):
+			if(neighbourDistanceToStart < minStartDistance):  
 				minStartDistance = neighbourDistanceToStart;
 			
 			# Checks if this is the node closest to the goal
-			neighBourDistanceToGoal = self.getGoalDistance(neighBour);
+			self.nodesToGoal = [];
+			neighBourDistanceToGoal = self.getShortestGoalDistance(neighBour);
 			if(neighBourDistanceToGoal < minGoalDistance):
 				minGoalDistance = neighBourDistanceToGoal;
 			
 			# Checks if the total is the lowest total, then it is the preferred choice
-			minTotalDistance = minStartDistance + minGoalDistance;
+			minTotalDistance =  minGoalDistance;
+			distances.append([minTotalDistance, neighBour]);
 			if(minTotalDistance < minTotalOfAll):
 				minTotalOfAll = minTotalDistance;
 				minNeighBour = neighBour;
-			print('Neighbour ' + str(neighBour) + ' Goal distance=' + str(minTotalDistance));
-		print('Selected: ' + str(minNeighBour));
+				
+		print(' minNeighBour: ' + str(minNeighBour) + " \n minGoalDistance:" + str(minTotalDistance));
 		return minNeighBour;
 
-	def getNeighbours(self, loc):
+	def getNeighbours(self, loc, passedNodes):
 		neighbours = [];
 		distances = [];
 		lowN = 0; highN = 3;
@@ -121,17 +129,20 @@ class TestAStar():
 				a = loc[0][0] + n - 1;
 				b = loc[0][1] + k - 1;
 				newPoint = [a, b];
-				distance = math.sqrt(a**2 + b**2);
+				if(a <= 2.0 and b <= 2.0):
+					distance = 1.0/math.sqrt(2.0);
+				else:
+					distance = math.sqrt(math.pow(a,2.0) + math.pow(b,2.0));
 				nodeWasPassed = False;
-				for node in self.passedNodes:
+				for node in passedNodes:
 					if(newPoint == node[0]):
 						nodeWasPassed = True;
 				if( x[n][k] == 1 and not nodeWasPassed):
 					if(self.points[b][a] == '0' or self.points[b][a] == 'G'):
-						print('n=' + str(n) + ' k=' + str(k));
-						print('b=' + str(b) + ' a=' + str(a));
-						print('points[b][a]=' + str(self.points[b][a]));
-						print('newPoint=' + str(newPoint));
+						#print('n=' + str(n) + ' k=' + str(k));
+						#print('b=' + str(b) + ' a=' + str(a));
+						#print('points[b][a]=' + str(self.points[b][a]));
+						#print('newPoint=' + str(newPoint));
 						neighbours.append([newPoint, distance]);
 		return neighbours;
 
@@ -141,57 +152,66 @@ class TestAStar():
 			totalWeight = totalWeight + node[1];
 		return totalWeight;
 
-	def getGoalDistance(self, location):
-		current = [];
-		current.append(location[0][0]);
-		current.append(location[0][1]);
+	def getShortestGoalDistance(self, location):
+		#x_abs = math.fabs(self.endPoint[0] - location[0][0]);
+		a = self.endPoint[0] - location[0][0];
 		
+		#y_abs = math.fabs(self.endPoint[1] - location[0][1]);
+		b = self.endPoint[1] - location[0][1];
+		if(a <= 2.0 and b <= 2.0):
+			return 1.0/math.sqrt(2.0);
+		else:
+			distance = math.sqrt(math.pow(a,2.0) + math.pow(b,2.0));
+		
+		return distance;
+		
+	def getEdgeDistance(self, own, target):
+		#calculates edge length
+		targetPoint = [target[0], target[1]];
+		current = [own[0], own[1]];
 		distance = 0;
-		
-		while(not current == self.endPoint):
+		while(not current == targetPoint):
 			#print(' current:' + str(current)  + ' endPoint:' + str(self.endPoint))
-			
-			if(current[0] < self.endPoint[0]):
+			if(current[0] < targetPoint[0]):
 				current[0] = current[0] + 1;
-				if((current[1] > self.endPoint[1])):
+				if((current[1] > targetPoint[1])):
 					current[1] = current[1] - 1;
 					distance = distance + 1/math.sqrt(2);
-
-				elif((current[1] < self.endPoint[1])):
+				elif((current[1] < targetPoint[1])):
 					current[1] = current[1] + 1;
 					distance = distance + 1/math.sqrt(2);
 				else:
 					distance = distance + 1;
 
-			elif(current[0] > self.endPoint[0]):
+			elif(current[0] > targetPoint[0]):
 				current[0] = current[0] - 1;
-				if((current[1] > self.endPoint[1])):
+				if((current[1] > targetPoint[1])):
 					current[1] = current[1] - 1;
 					distance = distance + 1/math.sqrt(2);
-				elif((current[1] < self.endPoint[1])):
+				elif((current[1] < targetPoint[1])):
 					current[1] = current[1] + 1;
 					distance = distance + 1/math.sqrt(2);
 				else:
 					distance = distance + 1;
 
-			elif(current[0] == self.endPoint[0]):
-				if(current[1] < self.endPoint[1]):
+			elif(current[0] == targetPoint[0]):
+				if(current[1] < targetPoint[1]):
 					current[1] = current[1] + 1;
 					distance = distance + 1;
-				if(current[1] > self.endPoint[1]):
+				if(current[1] > targetPoint[1]):
 					current[1] = current[1] - 1;
 					distance = distance + 1;
 
-			elif(current[1] == self.endPoint[1]):
-				if(current[0] < self.endPoint[0]):
+			elif(current[1] == targetPoint[1]):
+				if(current[0] < targetPoint[0]):
 					current[0] = current[0] + 1;
 					distance = distance + 1;
-				if(current[0] > self.endPoint[0]):
+				if(current[0] > targetPoint[0]):
 					current[0] = current[0] - 1;
 					distance = distance + 1;
-			elif(current == self.endPoint):
+			elif(current == targetPoint):
 				distance = distance;
-				time.sleep(1000000);
+				time.sleep(10000);
 		return distance;
 
 	def fullPath(self, passedNodes, currentNode):
@@ -211,19 +231,18 @@ class TestAStar():
 			testing = 0;
 			self.passedNodes.append(currentNode);
 			while(len(self.passedNodes) < totalLength and self.running):
-				
-				currentNode = self.findNextNode(self.endPoint, self.passedNodes);
-				self.passedNodes.append(currentNode);
-				print('Passed nodes: ' + str(self.passedNodes));
 				if(currentNode == self.endPoint):
 					#return fullPath(passedNodes, currentNode);
 					print('FOUND IT!');
 					return;
 				else:
-					print('Passing: ' + str(currentNode) + ' started at: ' + str(self.startPoint) + ' goal is: ' + str(self.endPoint));
-				time.sleep(0.2);
+					print('Start: ' + str(self.startPoint) + ' Goal: ' + str(self.endPoint) + ' Current: ' + str(currentNode));
+				currentNode = self.findNextNode(self.endPoint, self.passedNodes);
+				self.passedNodes.append(currentNode);
+				#print('Passed node: ' + str(currentNode));
+				
+				time.sleep(0.1);
 				self.callback.update();
 				while(self.paused):
 					time.sleep(1);
-					pass;
 	## Other help mehods
