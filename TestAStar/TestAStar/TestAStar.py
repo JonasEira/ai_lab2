@@ -88,7 +88,7 @@ class TestAStar():
 			
 			# Checks if this is the node closest to the goal
 			self.nodesToGoal = [];
-			neighBourDistanceToGoal = self.getShortestGoalDistance(neighBour);
+			neighBourDistanceToGoal = self.getTargetDistance(neighBour[0], self.endPoint)
 			if(neighBourDistanceToGoal < minGoalDistance):
 				minGoalDistance = neighBourDistanceToGoal;
 			
@@ -165,7 +165,7 @@ class TestAStar():
 		
 		return distance;
 		
-	def getEdgeDistance(self, own, target):
+	def getTargetDistance(self, own, target):
 		#calculates edge length
 		targetPoint = [target[0], target[1]];
 		current = [own[0], own[1]];
@@ -185,7 +185,7 @@ class TestAStar():
 
 			elif(current[0] > targetPoint[0]):
 				current[0] = current[0] - 1;
-				if((current[1] > targetPoint[1])):
+				if((current[1] > targetPoint[1])): 
 					current[1] = current[1] - 1;
 					distance = distance + 1/math.sqrt(2);
 				elif((current[1] < targetPoint[1])):
