@@ -86,12 +86,13 @@ class GameUI(object):
         [width, height] = pygame.display.get_surface().get_size()
         bSize = height / len(self.models['testAStar'].getDataPoints()[0]);
         passedNodes = self.models['testAStar'].getPassedNodes();
+        #print('Number of nodes: ' +str( len(passedNodes))   )
         lastNode = 0;
         greyColorInt = 128;
         whiteColorInt = 255;
         colorInt = whiteColorInt;
         for dataPoint in passedNodes:
-            if lastNode != 0: 
+            if lastNode != 0 and dataPoint != 0: 
                 if(lastNode[0][1] < dataPoint[0][1]):
                     colorInt = greyColorInt;
                 else:

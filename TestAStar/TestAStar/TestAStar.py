@@ -88,13 +88,13 @@ class TestAStar():
 			
 			# Checks if this is the node closest to the goal
 			self.nodesToGoal = [];
-			neighBourDistanceToGoal = self.getTargetDistance(neighBour[0], self.endPoint)
+			#neighBourDistanceToGoal = self.getTargetDistance(neighBour[0], self.endPoint)
+			neighBourDistanceToGoal = self.getShortestGoalDistance(neighBour)
 			if(neighBourDistanceToGoal < minGoalDistance):
 				minGoalDistance = neighBourDistanceToGoal;
-			
 			# Checks if the total is the lowest total, then it is the preferred choice
 			minTotalDistance =  minGoalDistance;
-			distances.append([minTotalDistance, neighBour]);
+			#distances.append([minTotalDistance, neighBour]);
 			if(minTotalDistance < minTotalOfAll):
 				minTotalOfAll = minTotalDistance;
 				minNeighBour = neighBour;
@@ -231,7 +231,7 @@ class TestAStar():
 			testing = 0;
 			self.passedNodes.append(currentNode);
 			while(len(self.passedNodes) < totalLength and self.running):
-				if(currentNode == self.endPoint):
+				if(currentNode[0] == self.endPoint):
 					#return fullPath(passedNodes, currentNode);
 					print('FOUND IT!');
 					return;
