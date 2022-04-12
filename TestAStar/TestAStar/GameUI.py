@@ -12,7 +12,7 @@ class GameUI(object):
 
     def startUI(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((800,600))
+        self.screen = pygame.display.set_mode((1200,900))
         running = True;
         
         while running:
@@ -33,7 +33,7 @@ class GameUI(object):
                         model = self.models['testAStar'];
                         model.setRunning(False);
                         running = False;
-                time.sleep(0.05);
+                time.sleep(0.02);
             self.update();
 
     def drawLine(self, x1, y1, x2, y2, r, g, b):
