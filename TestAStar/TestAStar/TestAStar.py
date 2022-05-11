@@ -164,55 +164,6 @@ class TestAStar():
 			distance = math.sqrt(math.pow(a,2.0) + math.pow(b,2.0));
 		
 		return distance;
-		
-	def getEdgeDistance(self, own, target):
-		#calculates edge length
-		targetPoint = [target[0], target[1]];
-		current = [own[0], own[1]];
-		distance = 0;
-		while(not current == targetPoint):
-			#print(' current:' + str(current)  + ' endPoint:' + str(self.endPoint))
-			if(current[0] < targetPoint[0]):
-				current[0] = current[0] + 1;
-				if((current[1] > targetPoint[1])):
-					current[1] = current[1] - 1;
-					distance = distance + 1/math.sqrt(2);
-				elif((current[1] < targetPoint[1])):
-					current[1] = current[1] + 1;
-					distance = distance + 1/math.sqrt(2);
-				else:
-					distance = distance + 1;
-
-			elif(current[0] > targetPoint[0]):
-				current[0] = current[0] - 1;
-				if((current[1] > targetPoint[1])):
-					current[1] = current[1] - 1;
-					distance = distance + 1/math.sqrt(2);
-				elif((current[1] < targetPoint[1])):
-					current[1] = current[1] + 1;
-					distance = distance + 1/math.sqrt(2);
-				else:
-					distance = distance + 1;
-
-			elif(current[0] == targetPoint[0]):
-				if(current[1] < targetPoint[1]):
-					current[1] = current[1] + 1;
-					distance = distance + 1;
-				if(current[1] > targetPoint[1]):
-					current[1] = current[1] - 1;
-					distance = distance + 1;
-
-			elif(current[1] == targetPoint[1]):
-				if(current[0] < targetPoint[0]):
-					current[0] = current[0] + 1;
-					distance = distance + 1;
-				if(current[0] > targetPoint[0]):
-					current[0] = current[0] - 1;
-					distance = distance + 1;
-			elif(current == targetPoint):
-				distance = distance;
-				time.sleep(10000);
-		return distance;
 
 	def fullPath(self, passedNodes, currentNode):
 		# This method will return a list of nodes bet
@@ -240,9 +191,7 @@ class TestAStar():
 				currentNode = self.findNextNode(self.endPoint, self.passedNodes);
 				self.passedNodes.append(currentNode);
 				#print('Passed node: ' + str(currentNode));
-				
-				time.sleep(0.1);
 				self.callback.update();
-				while(self.paused):
-					time.sleep(1);
+				
+					
 	## Other help mehods
